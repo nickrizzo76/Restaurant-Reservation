@@ -9,12 +9,14 @@ import ErrorAlert from "../layout/ErrorAlert";
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
+  console.log("in dashboard component")
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
 
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
+    console.log("loadDashboard")
     const abortController = new AbortController();
     setReservationsError(null);
     listReservations({ date }, abortController.signal)
