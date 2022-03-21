@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { createReservation } from "../utils/api";
+//import { today, formatAsTime } from "../utils/date-time";
 /**
  * Defines the new reservation for this application.
  *
@@ -9,19 +10,32 @@ import { createReservation } from "../utils/api";
 
 function NewReservation({ date }) {
   const history = useHistory();
+  const time = new Date()
+  // let hour = Number(time.getHours());
+  // let closestQuarterHour = Math.ceil(Number(time.getMinutes()) / 15) * 15;
+  // if(closestQuarterHour == 60) {
+
+  // }
+  // console.log(closestQuarterHour)
+  const timeString = (`${time.getHours()}:${time.getMinutes()}`)
+  //console.log(time.getHours(), time.getMinutes())
   const initalFormState = {
-    firstName: "",
-    lastName: "",
-    mobileNumber: "",
-    reservationDate: date,
-    reservationTime: "",
+    first_name: "",
+    last_name: "",
+    mobile_number: "",
+    reservation_date: date,
+    reservation_time: timeString,
     people: 1,
+    status: null
   };
+
+  console.log(initalFormState)
 
   const [reservationData, setReservationData] = useState({ ...initalFormState });
   const [reservationsError, setReservationsError] = useState(null);
 
   const handleChange = ({ target }) => {
+    console.log(target.name)
     setReservationData({
       ...reservationData,
       [target.name]: target.value,
@@ -46,10 +60,10 @@ function NewReservation({ date }) {
           <label htmlFor="first-name">First Name</label>
           <input
             id="first-name"
-            name="firstName"
+            name="first_name"
             type="text"
             onChange={handleChange}
-            value={reservationData.firstName}
+            value={reservationData.first_name}
             required
           />
         </div>
@@ -57,10 +71,10 @@ function NewReservation({ date }) {
           <label htmlFor="last-name">Last Name</label>
           <input
             id="last-name"
-            name="lastName"
+            name="last_name"
             type="text"
             onChange={handleChange}
-            value={reservationData.lastName}
+            value={reservationData.last_name}
             required
           />
         </div>
@@ -68,10 +82,10 @@ function NewReservation({ date }) {
           <label htmlFor="mobile-number">Mobile Number</label>
           <input
             id="mobile-number"
-            name="mobileNumber"
+            name="mobile_number"
             type="number"
             onChange={handleChange}
-            value={reservationData.mobileNumber}
+            value={reservationData.mobile_number}
             required
           />
         </div>
@@ -79,10 +93,10 @@ function NewReservation({ date }) {
           <label htmlFor="reservation-date">Date</label>
           <input
             id="reservation-date"
-            name="reservationDate"
+            name="reservation_date"
             type="date"
             onChange={handleChange}
-            value={reservationData.reservationDate}
+            value={reservationData.reservation_date}
             required
           />
         </div>
@@ -90,10 +104,10 @@ function NewReservation({ date }) {
           <label htmlFor="reservation-time">Time</label>
           <input
             id="reservation-time"
-            name="reservationTime"
+            name="reservation_time"
             type="time"
             onChange={handleChange}
-            value={reservationData.reservationTime}
+            value={reservationData.reservation_time}
             required
           />
         </div>

@@ -15,7 +15,12 @@ async function list(req, res, next) {
 }
 
 async function create(req, res, next) {
-  res.status(200)
+  const data = await service.create(req.body);
+  if(data) return res.json({ data })
+  next({
+    status: 500,
+    message: 'Failed to create reservation'
+  })
 }
 
 module.exports = {
