@@ -9,7 +9,8 @@ function list() {
 function listOnDate(reservation_date) {
     return knex(tableName)
     .select("*")
-    .where({reservation_date});
+    .where({reservation_date})
+    .orderBy('reservation_time', 'asc')
 }
 
 function create(reservation) {

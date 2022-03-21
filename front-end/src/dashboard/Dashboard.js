@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
-import { next, previous, today } from "../utils/date-time"
+import { next, previous, today } from "../utils/date-time";
+import Reservation from "../layout/Reservation/Reservation";
 
 /**
  * Defines the dashboard page.
@@ -25,6 +26,15 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
+  const reservationList = (
+    <ul>
+      {reservations.map((res) => (
+        <li key={res.reservation_id}>
+          <Reservation reservation={res} />
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <main>
@@ -33,17 +43,39 @@ function Dashboard({ date }) {
         <h4 className="mb-0">Reservations for date</h4>
       </div>
       <ErrorAlert error={reservationsError} />
-      {reservations.length > 0 ? JSON.stringify(reservations) : <p>There are currently no reservations for {reservationDate}</p>}
-      <button type="button" onClick={() => {setReservationDate(previous(reservationDate))}} className="btn btn-primary">
+      <button
+        type="button"
+        onClick={() => {
+          setReservationDate(previous(reservationDate));
+        }}
+        className="btn btn-primary"
+      >
         Yesterday
       </button>
-      <button type="button" onClick={() => {setReservationDate(today(reservationDate))}} className="btn btn-primary">
+      <button
+        type="button"
+        onClick={() => {
+          setReservationDate(today(reservationDate));
+        }}
+        className="btn btn-primary"
+      >
         Today
       </button>
-      <button type="button" onClick={() => {setReservationDate(next(reservationDate))}} className="btn btn-primary">
+      <button
+        type="button"
+        onClick={() => {
+          setReservationDate(next(reservationDate));
+        }}
+        className="btn btn-primary"
+      >
         Tomorrow
       </button>
-
+      {reservations.length > 0 ? (
+        reservationList
+      ) : (
+        <p>There are currently no reservations for {reservationDate}</p>
+      )}
+      
     </main>
   );
 }

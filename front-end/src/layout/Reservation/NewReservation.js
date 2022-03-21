@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { createReservation } from "../utils/api";
-//import { today, formatAsTime } from "../utils/date-time";
+import { createReservation } from "../../utils/api";
+
 /**
  * Defines the new reservation for this application.
  *
@@ -29,13 +29,11 @@ function NewReservation({ date }) {
     status: null
   };
 
-  console.log(initalFormState)
 
   const [reservationData, setReservationData] = useState({ ...initalFormState });
   const [reservationsError, setReservationsError] = useState(null);
 
   const handleChange = ({ target }) => {
-    console.log(target.name)
     setReservationData({
       ...reservationData,
       [target.name]: target.value,
@@ -47,7 +45,7 @@ function NewReservation({ date }) {
     const abortController = new AbortController();
     setReservationsError(null);
     createReservation(reservationData, abortController.signal)
-      .then(history.push('/dashboard'))
+      .then(history.push(`/dashboard/?date=${reservationData.reservation_date}`))
       .catch(setReservationsError);
     return () => abortController.abort();
   }
