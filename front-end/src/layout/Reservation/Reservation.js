@@ -9,7 +9,6 @@ import React, { useEffect, useState } from "react"
 function Reservation( { reservation } ) {
     const { reservation_id, first_name, last_name, mobile_number, reservation_date, reservation_time, people, status } = reservation
 
-    console.log(reservation)
     return (
         <>
             <p>Id {reservation_id} under {first_name} {last_name}</p>

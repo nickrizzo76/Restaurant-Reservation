@@ -82,6 +82,6 @@ export async function createReservation(reservation, signal) {
     signal: signal
   }
   const response = await fetchJson(url, options, [])
-  console.log(response);
+  //console.log(response);
   return response;
 }

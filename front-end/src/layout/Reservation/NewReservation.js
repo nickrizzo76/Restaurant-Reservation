@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import ErrorAlert from "../ErrorAlert";
 import { useHistory } from "react-router-dom";
 import { createReservation } from "../../utils/api";
 
@@ -10,15 +11,13 @@ import { createReservation } from "../../utils/api";
 
 function NewReservation({ date }) {
   const history = useHistory();
-  const time = new Date()
-  // let hour = Number(time.getHours());
-  // let closestQuarterHour = Math.ceil(Number(time.getMinutes()) / 15) * 15;
-  // if(closestQuarterHour == 60) {
+  const time = new Date();
 
-  // }
-  // console.log(closestQuarterHour)
-  const timeString = (`${time.getHours()}:${time.getMinutes()}`)
-  //console.log(time.getHours(), time.getMinutes())
+  const timeString = `${time.getHours().toString().padStart(2, "0")}:${time
+    .getMinutes()
+    .toString()
+    .padStart(2, "0")}`;
+
   const initalFormState = {
     first_name: "",
     last_name: "",
@@ -26,33 +25,81 @@ function NewReservation({ date }) {
     reservation_date: date,
     reservation_time: timeString,
     people: 1,
-    status: null
+    status: null,
   };
 
-
-  const [reservationData, setReservationData] = useState({ ...initalFormState });
-  const [reservationsError, setReservationsError] = useState(null);
+  const [reservation, setReservation] = useState({
+    ...initalFormState,
+  });
+  const [reservationErrors, setReservationErrors] = useState(null);
 
   const handleChange = ({ target }) => {
-    setReservationData({
-      ...reservationData,
+    setReservation({
+      ...reservation,
       [target.name]: target.value,
     });
   };
 
+  function validate(reservation) {
+    const errors = [];
+
+    function isFutureDate({ reservation_date, reservation_time }) {
+      const dateTime = new Date(`${reservation_date}T${reservation_time}`);
+      if (dateTime < new Date()) {
+        errors.push(new Error("Reservation must be set in the future"));
+      }
+    }
+
+    function isTuesday({ reservation_date }) {
+      const day = new Date(reservation_date).getUTCDay();
+      if (day === 2) {
+        errors.push(new Error("No reservations available on Tuesday."));
+      }
+    }
+
+    function isOpenHours({ reservation_time }) {
+      const hour = parseInt(reservation_time.split(":")[0]);
+      const mins = parseInt(reservation_time.split(":")[1]);
+
+      if (hour <= 10 && mins <= 30) {
+        errors.push(new Error("Restaurant is only open after 10:30 am"));
+      }
+
+      if (hour >= 22) {
+        errors.push(new Error("Restaurant is closed after 10:00 pm"));
+      }
+    }
+
+    isFutureDate(reservation);
+    isTuesday(reservation);
+    isOpenHours(reservation);
+
+    return errors;
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
+
+    const errors = validate(reservation);
+    if (errors.length) {
+      console.log(errors)
+      return setReservationErrors(errors);
+    }
+
     const abortController = new AbortController();
-    setReservationsError(null);
-    createReservation(reservationData, abortController.signal)
-      .then(history.push(`/dashboard/?date=${reservationData.reservation_date}`))
-      .catch(setReservationsError);
+    setReservationErrors(null);
+    createReservation(reservation, abortController.signal)
+      .then(history.push(`/dashboard/?date=${reservation.reservation_date}`))
+      .catch((error) => {
+        setReservationErrors(error);
+      });
     return () => abortController.abort();
   }
 
   return (
     <main>
       <h1>Create Reservation</h1>
+      <ErrorAlert error={reservationErrors ? reservationErrors[0] : null} />
       <form name="reservation-form" onSubmit={handleSubmit}>
         <div className="form-group d-md-flex mb-3">
           <label htmlFor="first-name">First Name</label>
@@ -61,7 +108,7 @@ function NewReservation({ date }) {
             name="first_name"
             type="text"
             onChange={handleChange}
-            value={reservationData.first_name}
+            value={reservation.first_name}
             required
           />
         </div>
@@ -72,7 +119,7 @@ function NewReservation({ date }) {
             name="last_name"
             type="text"
             onChange={handleChange}
-            value={reservationData.last_name}
+            value={reservation.last_name}
             required
           />
         </div>
@@ -83,7 +130,7 @@ function NewReservation({ date }) {
             name="mobile_number"
             type="number"
             onChange={handleChange}
-            value={reservationData.mobile_number}
+            value={reservation.mobile_number}
             required
           />
         </div>
@@ -94,7 +141,7 @@ function NewReservation({ date }) {
             name="reservation_date"
             type="date"
             onChange={handleChange}
-            value={reservationData.reservation_date}
+            value={reservation.reservation_date}
             required
           />
         </div>
@@ -105,7 +152,7 @@ function NewReservation({ date }) {
             name="reservation_time"
             type="time"
             onChange={handleChange}
-            value={reservationData.reservation_time}
+            value={reservation.reservation_time}
             required
           />
         </div>
@@ -117,18 +164,18 @@ function NewReservation({ date }) {
             type="number"
             min="1"
             onChange={handleChange}
-            value={reservationData.people}
+            value={reservation.people}
             required
           />
         </div>
         <button
-          className="btn btn-secondary mr-2"
           type="button"
+          className="btn btn-secondary mr-2"
           onClick={() => history.goBack()}
         >
           Cancel
         </button>
-        <button className="btn btn-primary" type="submit">
+        <button type="submit" className="btn btn-primary">
           Submit
         </button>
       </form>
