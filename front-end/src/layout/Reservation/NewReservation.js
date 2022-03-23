@@ -34,14 +34,38 @@ function NewReservation({ date }) {
   const [reservationErrors, setReservationErrors] = useState(null);
 
   const handleChange = ({ target }) => {
+    let { value, name } = target;
+    if (name === 'first_name' || name === 'last_name') {
+      const regex = /[a-zA-Z]/g; // match 1 word
+      const cleanArray = value.match(regex);
+      value = cleanArray ? cleanArray.join("") : "";
+    }
+
     setReservation({
       ...reservation,
-      [target.name]: target.value,
+      [name]: value,
     });
   };
 
   function validate(reservation) {
     const errors = [];
+
+    function isValidName({ first_name, last_name }) {
+      if (first_name.length < 2) {
+        errors.push(
+          new Error(
+            `First name '${first_name}' must be 2 or more letters and can't contain numbers or special characters.`
+          )
+        );
+      }
+      if (last_name.length < 2) {
+        errors.push(
+          new Error(
+            `Last name '${last_name}' must be 2 or more letters and can't contain numbers or special characters.`
+          )
+        );
+      }
+    }
 
     function isFutureDate({ reservation_date, reservation_time }) {
       const dateTime = new Date(`${reservation_date}T${reservation_time}`);
@@ -70,6 +94,7 @@ function NewReservation({ date }) {
       }
     }
 
+    isValidName(reservation);
     isFutureDate(reservation);
     isTuesday(reservation);
     isOpenHours(reservation);
@@ -82,7 +107,7 @@ function NewReservation({ date }) {
 
     const errors = validate(reservation);
     if (errors.length) {
-      console.log(errors)
+      console.log(errors);
       return setReservationErrors(errors);
     }
 
