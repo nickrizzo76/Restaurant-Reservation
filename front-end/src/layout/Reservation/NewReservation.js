@@ -12,7 +12,8 @@ import { createReservation } from "../../utils/api";
 function NewReservation({ date }) {
   const history = useHistory();
   const time = new Date();
-
+  let minutes = time.getMinutes();
+  console.log(minutes)
   const timeString = `${time.getHours().toString().padStart(2, "0")}:${time
     .getMinutes()
     .toString()
@@ -188,6 +189,7 @@ function NewReservation({ date }) {
             name="people"
             type="number"
             min="1"
+            max="10"
             onChange={handleChange}
             value={reservation.people}
             required

@@ -29,52 +29,72 @@ function bodyHas(propertyName) {
 function nameIsValid() {
   return function (req, _res, next) {
     const { first_name, last_name } = req.body;
-    const regex = /\w{1}/g; // match 1 word
-    const cleanedFirstName = first_name.match(regex).join("");
-    const cleanedLastName = last_name.match(regex).join("");
-    let error = { status: 400 };
-    console.log('nameIsValid()', cleanedFirstName, cleanedLastName)
-    if (cleanedFirstName.length < 2) {
-      console.log("first name invalid")
-      error.message = `The first name you submitted (${cleanedFirstName}) must be 2 or more letters. Only letters are valid.`;
-      console.log(error)
-      next(error);
-    }
-    if (cleanedLastName.length < 1) {
-      console.log("last name invalid")
-      error.message = `The last name you submitted (${cleanedLastName}) must be at least 1 letter. Only letters are valid.`;
-      next(error);
+    if (first_name.length < 2 || last_name.length < 2) {
+      next({
+        status: 400,
+        message: `"${first_name} ${last_name}" is invalid. Both names must be longer than 2 characters`,
+      });
     }
     next();
   };
 }
 
-function mobileNumberIsValid() {
-  return function (req, res, next) {
-    console.log('mobileNumberIsValid()')
+// Validate that reservation is in the future and not a Tuesday
+function reservationDateTimeIsValid() {
+  return function (req, _res, next) {
+    const { reservation_date, reservation_time } = req.body;
+    const dateTime = new Date(`${reservation_date}T${reservation_time}`);
+    if (dateTime < new Date()) {
+      next({
+        status: 400,
+        message: "Reservation must be set in the future",
+      });
+    }
+
+    if (dateTime.getUTCDay() === 2) {
+      next({
+        status: 400,
+        message: "No reservations available on Tuesday.",
+      });
+    }
     next();
-  }
+  };
 }
 
-function reservationDateIsValid() {
-  return function (req, res, next) {
-    console.log('reservationDateIsValid()')
-    next();
-  }
-}
-
+// Validate that reservation time is within open hours
 function reservationTimeIsValid() {
-  return function (req, res, next) {
-    console.log('reservationTimeIsValid()')
+  return function (req, _res, next) {
+    const { reservation_time } = req.body;
+    const hour = parseInt(reservation_time.split(":")[0]);
+    const mins = parseInt(reservation_time.split(":")[1]);
+    if (hour <= 10 && mins <= 30) {
+      next({
+        status: 400,
+        message: "Restaurant is only open after 10:30 am",
+      });
+    }
+
+    if (hour >= 22) {
+      next({
+        status: 400,
+        message: "Restaurant is closed after 10:00 pm",
+      });
+    }
     next();
-  }
+  };
 }
 
 function peopleIsValid() {
   return function (req, res, next) {
-    console.log('peopleIsValid()')
+    const { people } = req.body;
+    if (!Number(people)) {
+      next({
+        status: 400,
+        message: `${people} is an invalid party size`,
+      });
+    }
     next();
-  }
+  };
 }
 
 // create a reservation
@@ -96,8 +116,7 @@ module.exports = {
     bodyHas("reservation_time"),
     bodyHas("people"),
     nameIsValid(),
-    mobileNumberIsValid(),
-    reservationDateIsValid(),
+    reservationDateTimeIsValid(),
     reservationTimeIsValid(),
     peopleIsValid(),
     asyncErrorBoundary(createReservation),
