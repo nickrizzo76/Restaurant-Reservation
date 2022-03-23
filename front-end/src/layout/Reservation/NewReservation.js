@@ -12,8 +12,6 @@ import { createReservation } from "../../utils/api";
 function NewReservation({ date }) {
   const history = useHistory();
   const time = new Date();
-  let minutes = time.getMinutes();
-  console.log(minutes)
   const timeString = `${time.getHours().toString().padStart(2, "0")}:${time
     .getMinutes()
     .toString()
