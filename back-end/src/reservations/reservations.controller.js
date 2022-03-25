@@ -75,13 +75,13 @@ function reservationTimeIsValid() {
     const { reservation_time } = req.body.data;
     const error = {
       status: 400,
-      message: "reservation_time"
-    }
-    if(!reservation_time) return next(error)
+      message: "reservation_time",
+    };
+    if (!reservation_time) return next(error);
     // reservation_time exists, attempt to parse the time
     const hour = parseInt(reservation_time.split(":")[0]);
     const mins = parseInt(reservation_time.split(":")[1]);
-    if(!hour || !mins) return next(error)
+    if (!hour || !mins) return next(error);
     next();
   };
 }
@@ -89,7 +89,7 @@ function reservationTimeIsValid() {
 function peopleIsValid() {
   return function (req, _res, next) {
     const { people } = req.body.data;
-    if (!people || typeof people !== 'number' || people <= 0) {
+    if (!people || typeof people !== "number" || people <= 0) {
       return next({
         status: 400,
         message: `people`,
@@ -97,6 +97,32 @@ function peopleIsValid() {
     }
     next();
   };
+}
+
+function reservationDateIsInTheFuture() {
+  return function (req, _res, next) {
+    const { reservation_date, reservation_time } = req.body.data;
+    const dateTime = new Date(`${reservation_date}T${reservation_time}`);
+    if (dateTime < new Date()) {
+      return next({
+        status: 400,
+        message: "Reservation must be in the future",
+      });
+    }
+    next();
+  };
+}
+
+function reservationDateIsNotTuesday() {
+  return function (req, _res, next) {
+    const { reservation_date } = req.body.data;
+    const day = new Date(reservation_date).getUTCDay();
+    if(day === 2) return next({
+      status: 400,
+      message: "closed"
+    })
+    next();
+  }
 }
 
 // create a reservation
@@ -118,6 +144,7 @@ module.exports = {
     reservationTimeIsValid(),
     peopleIsValid(),
     reservationDateIsInTheFuture(),
+    reservationDateIsNotTuesday(),
     asyncErrorBoundary(createReservation),
   ],
   list: asyncErrorBoundary(list),
