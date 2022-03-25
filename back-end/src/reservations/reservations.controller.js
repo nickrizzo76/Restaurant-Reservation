@@ -71,7 +71,7 @@ function reservationDateIsValid() {
 
 // Validate that reservation time exists and is correctly formatted
 function reservationTimeIsValid() {
-  return function (req, _res, next) {
+  return function (req, res, next) {
     const { reservation_time } = req.body.data;
     const error = {
       status: 400,
@@ -82,6 +82,8 @@ function reservationTimeIsValid() {
     const hour = parseInt(reservation_time.split(":")[0]);
     const mins = parseInt(reservation_time.split(":")[1]);
     if (!hour || !mins) return next(error);
+    res.locals.hour = hour;
+    res.locals.mins = mins;
     next();
   };
 }
@@ -117,12 +119,26 @@ function reservationDateIsNotTuesday() {
   return function (req, _res, next) {
     const { reservation_date } = req.body.data;
     const day = new Date(reservation_date).getUTCDay();
-    if(day === 2) return next({
-      status: 400,
-      message: "closed"
-    })
+    if (day === 2)
+      return next({
+        status: 400,
+        message: "closed",
+      });
     next();
-  }
+  };
+}
+
+function reservationIsDuringOpenHours() {
+  return function (_req, res, next) {
+    const { hour, mins } = res.locals
+    if (hour >= 22 || (hour <= 10 && mins <= 30)) {
+      return next({
+        status: 400,
+        message: "Not open during those hours"
+      })
+    }
+    next();
+  };
 }
 
 // create a reservation
@@ -145,6 +161,7 @@ module.exports = {
     peopleIsValid(),
     reservationDateIsInTheFuture(),
     reservationDateIsNotTuesday(),
+    reservationIsDuringOpenHours(),
     asyncErrorBoundary(createReservation),
   ],
   list: asyncErrorBoundary(list),
