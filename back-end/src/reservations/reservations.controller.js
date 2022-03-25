@@ -88,8 +88,8 @@ function reservationTimeIsValid() {
 function peopleIsValid() {
   return function (req, _res, next) {
     const { people } = req.body.data;
-    if (!people || typeof people !== Number || people <= 0) {
-      next({
+    if (!people || typeof people !== 'number' || people <= 0) {
+      return next({
         status: 400,
         message: `people`,
       });
@@ -100,8 +100,8 @@ function peopleIsValid() {
 
 // create a reservation
 async function createReservation(req, res, next) {
-  const data = await service.create(req.body);
-  if (data) return res.json({ data });
+  const data = await service.create(req.body.data);
+  if (data) return res.status(201).json({ data });
   next({
     status: 500,
     message: "Failed to create reservation",
@@ -110,12 +110,12 @@ async function createReservation(req, res, next) {
 
 module.exports = {
   create: [
-    bodyHasData(),
-    nameIsValid(),
-    mobileNumberIsValid(),
-    reservationDateIsValid(),
-    reservationTimeIsValid(),
-    peopleIsValid(),
+    asyncErrorBoundary(bodyHasData()),
+    asyncErrorBoundary(nameIsValid()),
+    asyncErrorBoundary(mobileNumberIsValid()),
+    asyncErrorBoundary(reservationDateIsValid()),
+    asyncErrorBoundary(reservationTimeIsValid()),
+    asyncErrorBoundary(peopleIsValid()),
     asyncErrorBoundary(createReservation),
   ],
   list: asyncErrorBoundary(list),
