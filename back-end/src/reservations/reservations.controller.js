@@ -18,9 +18,10 @@ async function list(req, res, next) {
 function bodyHasData() {
   return function (req, _res, next) {
     const { data } = req.body;
-    if (!data) next({
-      status: 400
-    });
+    if (!data)
+      next({
+        status: 400,
+      });
     next();
   };
 }
@@ -29,39 +30,56 @@ function nameIsValid() {
   return function (req, _res, next) {
     const { first_name, last_name } = req.body.data;
     const error = { status: 400 };
-    if(!first_name || !first_name.length) {
-      error.message = `first_name`
-      return next(error)
+    if (!first_name || !first_name.length) {
+      error.message = `first_name`;
+      return next(error);
     }
-    if(!last_name || !last_name.length) {
-      error.message = `last_name`
-      return next(error)
+    if (!last_name || !last_name.length) {
+      error.message = `last_name`;
+      return next(error);
     }
-    
+
+    next();
+  };
+}
+
+function mobileNumberIsValid() {
+  return function (req, _res, next) {
+    const { mobile_number } = req.body.data;
+    if (!mobile_number)
+      return next({
+        status: 400,
+        message: "mobile_number",
+      });
     next();
   };
 }
 
 // Validate that reservation is in the future and not a Tuesday
-function reservationDateTimeIsValid() {
+function reservationDateIsValid() {
   return function (req, _res, next) {
-    const { reservation_date, reservation_time } = req.body;
-    const dateTime = new Date(`${reservation_date}T${reservation_time}`);
-    if (dateTime < new Date()) {
-      next({
+    const { reservation_date } = req.body.data;
+    //const dateTime = new Date(`${reservation_date}T${reservation_time}`);
+    if (!reservation_date || new Date(reservation_date) == 'Invalid Date')
+      return next({
         status: 400,
-        message: "Reservation must be set in the future",
+        message: "reservation_date",
       });
-    }
-
-    if (dateTime.getUTCDay() === 2) {
-      next({
-        status: 400,
-        message: "No reservations available on Tuesday.",
-      });
-    }
     next();
   };
+
+  // if (date < new Date()) {
+  //   next({
+  //     status: 400,
+  //     message: "Reservation must be set in the future",
+  //   });
+  // if (dateTime.getUTCDay() === 2) {
+  //   next({
+  //     status: 400,
+  //     message: "No reservations available on Tuesday.",
+  //   });
+  // }
+  // next();
 }
 
 // Validate that reservation time is within open hours
@@ -114,6 +132,8 @@ module.exports = {
   create: [
     bodyHasData(),
     nameIsValid(),
+    mobileNumberIsValid(),
+    reservationDateIsValid(),
     // reservationDateTimeIsValid(),
     // reservationTimeIsValid(),
     // peopleIsValid(),
