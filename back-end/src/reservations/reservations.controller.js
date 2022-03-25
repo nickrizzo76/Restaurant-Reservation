@@ -15,26 +15,29 @@ async function list(req, res, next) {
 }
 
 // checks if body contains the property.  Does NOT validate the property
-function bodyHas(propertyName) {
+function bodyHasData() {
   return function (req, _res, next) {
-    const { body = {} } = req;
-    if (body[propertyName]) return next();
-    next({
-      status: 400,
-      message: `Reservation must include a ${propertyName}`,
+    const { data } = req.body;
+    if (!data) next({
+      status: 400
     });
+    next();
   };
 }
 
 function nameIsValid() {
   return function (req, _res, next) {
-    const { first_name, last_name } = req.body;
-    if (first_name.length < 2 || last_name.length < 2) {
-      next({
-        status: 400,
-        message: `"${first_name} ${last_name}" is invalid. Both names must be longer than 2 characters`,
-      });
+    const { first_name, last_name } = req.body.data;
+    const error = { status: 400 };
+    if(!first_name || !first_name.length) {
+      error.message = `first_name`
+      return next(error)
     }
+    if(!last_name || !last_name.length) {
+      error.message = `last_name`
+      return next(error)
+    }
+    
     next();
   };
 }
@@ -109,16 +112,11 @@ async function createReservation(req, res, next) {
 
 module.exports = {
   create: [
-    bodyHas("first_name"),
-    bodyHas("last_name"),
-    bodyHas("mobile_number"),
-    bodyHas("reservation_date"),
-    bodyHas("reservation_time"),
-    bodyHas("people"),
+    bodyHasData(),
     nameIsValid(),
-    reservationDateTimeIsValid(),
-    reservationTimeIsValid(),
-    peopleIsValid(),
+    // reservationDateTimeIsValid(),
+    // reservationTimeIsValid(),
+    // peopleIsValid(),
     asyncErrorBoundary(createReservation),
   ],
   list: asyncErrorBoundary(list),
