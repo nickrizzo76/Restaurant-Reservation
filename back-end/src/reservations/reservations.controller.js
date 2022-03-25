@@ -2,7 +2,7 @@ const service = require("./reservations.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
 // list reservations
-async function list(req, res, next) {
+async function list(req, res, _next) {
   // list reservations only on the date passed in the query
   const { date } = req.query;
   if (date) {
@@ -13,7 +13,7 @@ async function list(req, res, next) {
   return res.json({ data });
 }
 
-// checks if body contains the property.  Does NOT validate the property
+// checks if body contains data
 function bodyHasData() {
   return function (req, _res, next) {
     const { data } = req.body;
@@ -25,6 +25,7 @@ function bodyHasData() {
   };
 }
 
+// Validate name exists and is not empty
 function nameIsValid() {
   return function (req, _res, next) {
     const { first_name, last_name } = req.body.data;
@@ -42,6 +43,7 @@ function nameIsValid() {
   };
 }
 
+// Validate mobile number exists
 function mobileNumberIsValid() {
   return function (req, _res, next) {
     const { mobile_number } = req.body.data;
@@ -54,7 +56,7 @@ function mobileNumberIsValid() {
   };
 }
 
-// Validate that reservation is in the future and not a Tuesday
+// Validate that reservation date exists and is correctly formatted
 function reservationDateIsValid() {
   return function (req, _res, next) {
     const { reservation_date } = req.body.data;
@@ -67,7 +69,7 @@ function reservationDateIsValid() {
   };
 }
 
-// Validate that reservation time is within open hours
+// Validate that reservation time exists and is correctly formatted
 function reservationTimeIsValid() {
   return function (req, _res, next) {
     const { reservation_time } = req.body.data;
@@ -115,6 +117,7 @@ module.exports = {
     reservationDateIsValid(),
     reservationTimeIsValid(),
     peopleIsValid(),
+    reservationDateIsInTheFuture(),
     asyncErrorBoundary(createReservation),
   ],
   list: asyncErrorBoundary(list),
