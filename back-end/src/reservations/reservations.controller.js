@@ -86,12 +86,12 @@ function reservationTimeIsValid() {
 }
 
 function peopleIsValid() {
-  return function (req, res, next) {
-    const { people } = req.body;
-    if (!Number(people)) {
+  return function (req, _res, next) {
+    const { people } = req.body.data;
+    if (!people || typeof people !== Number || people <= 0) {
       next({
         status: 400,
-        message: `${people} is an invalid party size`,
+        message: `people`,
       });
     }
     next();
@@ -115,7 +115,7 @@ module.exports = {
     mobileNumberIsValid(),
     reservationDateIsValid(),
     reservationTimeIsValid(),
-    // peopleIsValid(),
+    peopleIsValid(),
     asyncErrorBoundary(createReservation),
   ],
   list: asyncErrorBoundary(list),
