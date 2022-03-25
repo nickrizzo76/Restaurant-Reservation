@@ -59,48 +59,28 @@ function mobileNumberIsValid() {
 function reservationDateIsValid() {
   return function (req, _res, next) {
     const { reservation_date } = req.body.data;
-    //const dateTime = new Date(`${reservation_date}T${reservation_time}`);
-    if (!reservation_date || new Date(reservation_date) == 'Invalid Date')
+    if (!reservation_date || new Date(reservation_date) == "Invalid Date")
       return next({
         status: 400,
         message: "reservation_date",
       });
     next();
   };
-
-  // if (date < new Date()) {
-  //   next({
-  //     status: 400,
-  //     message: "Reservation must be set in the future",
-  //   });
-  // if (dateTime.getUTCDay() === 2) {
-  //   next({
-  //     status: 400,
-  //     message: "No reservations available on Tuesday.",
-  //   });
-  // }
-  // next();
 }
 
 // Validate that reservation time is within open hours
 function reservationTimeIsValid() {
   return function (req, _res, next) {
-    const { reservation_time } = req.body;
+    const { reservation_time } = req.body.data;
+    const error = {
+      status: 400,
+      message: "reservation_time"
+    }
+    if(!reservation_time) return next(error)
+    // reservation_time exists, attempt to parse the time
     const hour = parseInt(reservation_time.split(":")[0]);
     const mins = parseInt(reservation_time.split(":")[1]);
-    if (hour <= 10 && mins <= 30) {
-      next({
-        status: 400,
-        message: "Restaurant is only open after 10:30 am",
-      });
-    }
-
-    if (hour >= 22) {
-      next({
-        status: 400,
-        message: "Restaurant is closed after 10:00 pm",
-      });
-    }
+    if(!hour || !mins) return next(error)
     next();
   };
 }
@@ -134,8 +114,7 @@ module.exports = {
     nameIsValid(),
     mobileNumberIsValid(),
     reservationDateIsValid(),
-    // reservationDateTimeIsValid(),
-    // reservationTimeIsValid(),
+    reservationTimeIsValid(),
     // peopleIsValid(),
     asyncErrorBoundary(createReservation),
   ],
