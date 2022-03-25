@@ -4,10 +4,10 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 // list reservations
 async function list(req, res, next) {
   // list reservations only on the date passed in the query
-  const date = req.query.reservationDate;
+  const { date } = req.query;
+  console.log(date)
   if (date) {
-    data = await service.listOnDate(date);
-    return res.json({ data });
+    return res.json({ data: await service.listOnDate(date) });
   }
   // list all reservations (no date given)
   data = await service.list();

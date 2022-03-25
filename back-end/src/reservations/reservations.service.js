@@ -3,7 +3,9 @@ const knex = require("../db/connection");
 const tableName = "reservations";
 
 function list() {
-    return knex(tableName).select("*");
+    return knex(tableName)
+        .select("*")
+        .orderBy('reservation_time', 'asc')
 }
 
 function listOnDate(reservation_date) {
