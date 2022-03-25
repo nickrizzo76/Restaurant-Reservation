@@ -109,12 +109,12 @@ async function createReservation(req, res, next) {
 
 module.exports = {
   create: [
-    asyncErrorBoundary(bodyHasData()),
-    asyncErrorBoundary(nameIsValid()),
-    asyncErrorBoundary(mobileNumberIsValid()),
-    asyncErrorBoundary(reservationDateIsValid()),
-    asyncErrorBoundary(reservationTimeIsValid()),
-    asyncErrorBoundary(peopleIsValid()),
+    bodyHasData(),
+    nameIsValid(),
+    mobileNumberIsValid(),
+    reservationDateIsValid(),
+    reservationTimeIsValid(),
+    peopleIsValid(),
     asyncErrorBoundary(createReservation),
   ],
   list: asyncErrorBoundary(list),
