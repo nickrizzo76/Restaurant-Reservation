@@ -12,7 +12,15 @@ function create(table) {
     .then((createdRecords) => createdRecords[0]);
 }
 
+function read(table_id) {
+    return knex(tableName)
+        .list("*")
+        .where({ table_id: table_id })
+        .first();
+}
+
 module.exports = {
   list,
   create,
+  read
 };
