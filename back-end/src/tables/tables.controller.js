@@ -33,12 +33,12 @@ function create(req, res, next) {
   res.json({ data: {} });
 }
 
-function list(req, res, next) {
-  res.json({ data: {} });
+async function list(_req, res, _next) {
+  res.json({ data: await service.list() });
 }
 
 module.exports = {
   // list: asyncErrorBoundary(list),
   create: [bodyHasData(), nameIsValid(), capacityIsValid(), asyncErrorBoundary(create)],
-  list,
+  list: asyncErrorBoundary(list),
 };
