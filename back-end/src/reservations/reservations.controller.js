@@ -1,6 +1,24 @@
 const service = require("./reservations.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
+function reservationExists() {
+  return async function (req, res, next) {
+    const reservation = await service.read(req.params.reservation_Id);
+    if (reservation) {
+      res.locals.reservation = reservation;
+      return next();
+    }
+    next({
+      status: 404,
+      message: "reservation_id",
+    });
+  };
+}
+
+function read(_req, res, _next) {
+  res.json({ data: res.locals.reservation })
+}
+
 // list reservations
 async function list(req, res, _next) {
   // list reservations only on the date passed in the query
@@ -130,12 +148,12 @@ function reservationDateIsNotTuesday() {
 
 function reservationIsDuringOpenHours() {
   return function (_req, res, next) {
-    const { hour, mins } = res.locals
+    const { hour, mins } = res.locals;
     if (hour >= 22 || (hour <= 10 && mins <= 30)) {
       return next({
         status: 400,
-        message: "Not open during those hours"
-      })
+        message: "Not open during those hours",
+      });
     }
     next();
   };
@@ -165,4 +183,8 @@ module.exports = {
     asyncErrorBoundary(createReservation),
   ],
   list: asyncErrorBoundary(list),
+  read: [
+    asyncErrorBoundary(reservationExists()), 
+    read
+  ],
 };

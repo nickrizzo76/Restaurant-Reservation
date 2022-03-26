@@ -29,8 +29,8 @@ function capacityIsValid() {
     }
 }
 
-function create(req, res, next) {
-  res.json({ data: {} });
+async function create(req, res, _next) {
+  res.status(201).json({ data: await service.create(req.body.data) });
 }
 
 async function list(_req, res, _next) {
