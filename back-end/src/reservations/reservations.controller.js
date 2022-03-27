@@ -3,7 +3,7 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
 function reservationExists() {
   return async function (req, res, next) {
-    const reservation = await service.read(req.params.reservation_Id);
+    const reservation = await service.read(req.params.reservation_id);
     if (reservation) {
       res.locals.reservation = reservation;
       return next();

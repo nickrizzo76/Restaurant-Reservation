@@ -7,7 +7,7 @@
 const router = require("express").Router();
 const controller = require("./reservations.controller");
 
-router.route("/:reservation_Id")
+router.route("/:reservation_id")
     .get(controller.read)
 
 router.route("/")
