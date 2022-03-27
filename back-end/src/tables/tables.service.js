@@ -14,13 +14,22 @@ function create(table) {
 
 function read(table_id) {
     return knex(tableName)
-        .list("*")
+        .select("*")
         .where({ table_id: table_id })
         .first();
+}
+
+function update(updatedTable) {
+    return knex(tableName)
+        .select("*")
+        .where({ table_id: updatedTable.table_id })
+        .update(updatedTable)
+        .then(() => read(updatedTable.table_id));
 }
 
 module.exports = {
   list,
   create,
-  read
+  read,
+  update
 };
