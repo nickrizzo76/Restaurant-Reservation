@@ -59,7 +59,7 @@ function tableExists() {
     }
     next({
       status: 404,
-      message: "table_id",
+      message: table_id,
     });
   };
 }
@@ -108,6 +108,20 @@ async function create(req, res, _next) {
   res.status(201).json({ data: await service.create(req.body.data) });
 }
 
+async function finishTable(_req, res, next) {
+    const { reservation_id } = res.locals.table
+    if(reservation_id) {
+        const freedTable = res.locals.table;
+        freedTable.reservation_id = null;
+        const data = await service.update(freedTable);
+        res.json({ data })
+    }
+    next({
+        status: 400,
+        message: "not occupied"
+    })
+}
+
 async function list(_req, res, _next) {
   res.json({ data: await service.list() });
 }
@@ -126,6 +140,10 @@ module.exports = {
     nameIsValid(),
     capacityIsValid(),
     asyncErrorBoundary(create),
+  ],
+  delete: [
+      asyncErrorBoundary(tableExists()),
+      asyncErrorBoundary(finishTable)
   ],
   list: asyncErrorBoundary(list),
   update: [
