@@ -31,5 +31,5 @@ module.exports = {
   list,
   create,
   read,
-  update
+  update,
 };
