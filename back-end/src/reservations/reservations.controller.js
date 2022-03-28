@@ -10,7 +10,7 @@ function reservationExists() {
     }
     next({
       status: 404,
-      message: "reservation_id",
+      message: `${req.params.reservation_id}`
     });
   };
 }
