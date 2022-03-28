@@ -2,51 +2,43 @@ const service = require("./tables.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const reservationsService = require("../reservations/reservations.service");
 
-function bodyHasData() {
-  return function (req, _res, next) {
-    const { data } = req.body;
-    if (!data) {
-      next({
-        status: 400,
-        message: "body",
-      });
-    }
-    next();
-  };
+function bodyHasData(req, _res, next) {
+  const { data } = req.body;
+  if (!data) {
+    next({
+      status: 400,
+      message: "body",
+    });
+  }
+  next();
 }
 
-function bodyHasReservationId() {
-  return function (req, res, next) {
-    const { reservation_id } = req.body.data;
-    if (!reservation_id) {
-      return next({
-        status: 400,
-        message: "reservation_id",
-      });
-    }
-    res.locals.reservation_id = reservation_id;
-    next();
-  };
+function bodyHasReservationId(req, res, next) {
+  const { reservation_id } = req.body.data;
+  if (!reservation_id) {
+    return next({
+      status: 400,
+      message: "reservation_id",
+    });
+  }
+  res.locals.reservation_id = reservation_id;
+  next();
 }
 
-function nameIsValid() {
-  return function (req, _res, next) {
-    const { table_name } = req.body.data;
-    if (!table_name || !table_name.length || table_name.length === 1) {
-      return next({ status: 400, message: "table_name" });
-    }
-    next();
-  };
+function nameIsValid(req, _res, next) {
+  const { table_name } = req.body.data;
+  if (!table_name || !table_name.length || table_name.length === 1) {
+    return next({ status: 400, message: "table_name" });
+  }
+  next();
 }
 
-function capacityIsValid() {
-  return function (req, _res, next) {
-    const { capacity } = req.body.data;
-    if (!capacity || typeof capacity !== "number") {
-      next({ status: 400, message: "capacity" });
-    }
-    next();
-  };
+function capacityIsValid(req, _res, next) {
+  const { capacity } = req.body.data;
+  if (!capacity || typeof capacity !== "number") {
+    next({ status: 400, message: "capacity" });
+  }
+  next();
 }
 
 function tableExists() {
@@ -64,31 +56,27 @@ function tableExists() {
   };
 }
 
-function tableCapacityIsLargeEnough() {
-  return function (_req, res, next) {
-    const { capacity } = res.locals.table;
-    const { people } = res.locals.reservation;
-    if (capacity >= people) return next();
-    next({
-      status: 400,
-      message: "capacity",
-    });
-  };
+function tableCapacityIsLargeEnough(_req, res, next) {
+  const { capacity } = res.locals.table;
+  const { people } = res.locals.reservation;
+  if (capacity >= people) return next();
+  next({
+    status: 400,
+    message: "capacity",
+  });
 }
 
-function tableIsOccupied() {
-  return function (_req, res, next) {
-    const { reservation_id } = res.locals.table;
+function tableIsOccupied(_req, res, next) {
+  const { reservation_id } = res.locals.table;
 
-    if (reservation_id) {
-      return next({
-        status: 400,
-        message: "occupied",
-      });
-    }
+  if (reservation_id) {
+    return next({
+      status: 400,
+      message: "occupied",
+    });
+  }
 
-    next();
-  };
+  next();
 }
 
 function reservationIdExists() {
@@ -109,17 +97,17 @@ async function create(req, res, _next) {
 }
 
 async function finishTable(_req, res, next) {
-    const { reservation_id } = res.locals.table
-    if(reservation_id) {
-        const freedTable = res.locals.table;
-        freedTable.reservation_id = null;
-        const data = await service.update(freedTable);
-        res.json({ data })
-    }
-    next({
-        status: 400,
-        message: "not occupied"
-    })
+  const { reservation_id } = res.locals.table;
+  if (reservation_id) {
+    const freedTable = res.locals.table;
+    freedTable.reservation_id = null;
+    const data = await service.update(freedTable);
+    res.json({ data });
+  }
+  next({
+    status: 400,
+    message: "not occupied",
+  });
 }
 
 async function list(_req, res, _next) {
@@ -136,23 +124,20 @@ async function update(_req, res, _next) {
 
 module.exports = {
   create: [
-    bodyHasData(),
-    nameIsValid(),
-    capacityIsValid(),
+    bodyHasData,
+    nameIsValid,
+    capacityIsValid,
     asyncErrorBoundary(create),
   ],
-  delete: [
-      asyncErrorBoundary(tableExists()),
-      asyncErrorBoundary(finishTable)
-  ],
+  delete: [asyncErrorBoundary(tableExists()), asyncErrorBoundary(finishTable)],
   list: asyncErrorBoundary(list),
   update: [
-    bodyHasData(),
-    bodyHasReservationId(),
+    bodyHasData,
+    bodyHasReservationId,
     asyncErrorBoundary(reservationIdExists()),
     asyncErrorBoundary(tableExists()),
-    tableCapacityIsLargeEnough(),
-    tableIsOccupied(),
+    tableCapacityIsLargeEnough,
+    tableIsOccupied,
     asyncErrorBoundary(update),
   ],
 };
