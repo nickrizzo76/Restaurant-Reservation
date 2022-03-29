@@ -59,29 +59,25 @@ async function fetchJson(url, options, onCancel) {
  */
 
 export async function listReservations(params, signal) {
-  //console.log("list reservations in api", params)
-  //console.log('headers ', headers.get("Content-Type"))
   const url = new URL(`${API_BASE_URL}/reservations`);
   Object.entries(params).forEach(([key, value]) =>
     url.searchParams.append(key, value.toString())
   );
-  //console.log(url);
+
   return await fetchJson(url, { headers, signal }, [])
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
 
 export async function createReservation(reservation, signal) {
-  //console.log("createReservation", reservation)
   const url = new URL(`${API_BASE_URL}/reservations`);
   const options = {
     method: 'POST',
     mode: 'cors',
     headers: headers,
-    body: JSON.stringify(reservation),
+    body: JSON.stringify({data: reservation}),
     signal: signal
   }
   const response = await fetchJson(url, options, [])
-  //console.log(response);
   return response;
 }

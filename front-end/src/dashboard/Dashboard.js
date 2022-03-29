@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useHistory } from "react";
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { next, previous, today } from "../utils/date-time";
@@ -35,6 +35,8 @@ function Dashboard({ date }) {
       ))}
     </ul>
   );
+
+  //console.log(reservationDate)
 
   return (
     <main>
