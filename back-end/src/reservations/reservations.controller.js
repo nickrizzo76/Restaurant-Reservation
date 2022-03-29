@@ -1,19 +1,17 @@
 const service = require("./reservations.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
-function reservationExists() {
-  return async function (req, res, next) {
-    const reservation = await service.read(req.params.reservation_id);
-    if (reservation) {
-      res.locals.reservation = reservation;
-      return next();
-    }
-    next({
-      status: 404,
-      message: `${req.params.reservation_id}`,
-    });
-  };
-}
+async function reservationExists(req, res, next) {
+  const reservation = await service.read(req.params.reservation_id);
+  if (reservation) {
+    res.locals.reservation = reservation;
+    return next();
+  }
+  next({
+    status: 404,
+    message: `${req.params.reservation_id}`,
+  });
+};
 
 function read(_req, res, _next) {
   res.json({ data: res.locals.reservation });
@@ -27,8 +25,8 @@ async function list(req, res, _next) {
     return res.json({ data: await service.listOnDate(date) });
   }
   const { mobile_number } = req.query;
-  if(mobile_number) {
-    return res.json({ data: await service.listForNumber(mobile_number)})
+  if (mobile_number) {
+    return res.json({ data: await service.listForNumber(mobile_number) });
   }
   // list all reservations (no date given)
   data = await service.list();
@@ -92,8 +90,8 @@ function timeIsValid(req, res, next) {
   };
   if (!reservation_time) return next(error);
   // reservation_time exists, attempt to parse the time
-  const hour = parseInt(reservation_time.split(":")[0]);
-  const mins = parseInt(reservation_time.split(":")[1]);
+  const hour = Number(reservation_time.split(":")[0]);
+  const mins = Number(reservation_time.split(":")[1]);
   if (!hour || !mins) return next(error);
   res.locals.hour = hour;
   res.locals.mins = mins;
@@ -111,16 +109,6 @@ function peopleIsValid(req, _res, next) {
   next();
 }
 
-// function statusIsValid(req, res, next) {
-//   const { status } = req.body.data;
-//   // status on creation should be 'booked'
-//   if (!status || status !== "booked")
-//     return next({
-//       status: 400,
-//       message: `${status}`,
-//     });
-//   next();
-// }
 
 function dateIsInTheFuture(req, _res, next) {
   const { reservation_date, reservation_time } = req.body.data;
@@ -207,6 +195,7 @@ async function update(req, res, next) {
   res.json({ data });
 }
 
+
 module.exports = {
   create: [
     bodyHasData,
@@ -221,10 +210,23 @@ module.exports = {
     asyncErrorBoundary(create),
   ],
   list: asyncErrorBoundary(list),
-  read: [asyncErrorBoundary(reservationExists()), read],
+  read: [asyncErrorBoundary(reservationExists), read],
   update: [
     bodyHasData,
-    asyncErrorBoundary(reservationExists()),
+    nameIsValid,
+    mobileNumberIsValid,
+    dateIsValid,
+    timeIsValid,
+    peopleIsValid,
+    dateIsInTheFuture,
+    dateIsNotTuesday,
+    isDuringOpenHours,
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(update),
+  ],
+  status: [
+    bodyHasData,
+    asyncErrorBoundary(reservationExists),
     isNotFinished,
     newStatusIsValid,
     asyncErrorBoundary(update),
