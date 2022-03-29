@@ -26,6 +26,10 @@ async function list(req, res, _next) {
   if (date) {
     return res.json({ data: await service.listOnDate(date) });
   }
+  const { mobile_number } = req.query;
+  if(mobile_number) {
+    return res.json({ data: await service.listForNumber(mobile_number)})
+  }
   // list all reservations (no date given)
   data = await service.list();
   return res.json({ data });
