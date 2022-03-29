@@ -11,7 +11,7 @@ async function reservationExists(req, res, next) {
     status: 404,
     message: `${req.params.reservation_id}`,
   });
-};
+}
 
 function read(_req, res, _next) {
   res.json({ data: res.locals.reservation });
@@ -34,7 +34,7 @@ async function list(req, res, _next) {
 }
 
 // checks if body contains data
-function bodyHasData(req, res, next) {
+function bodyHasData(req, _res, next) {
   const { data } = req.body;
   if (!data)
     next({
@@ -92,7 +92,9 @@ function timeIsValid(req, res, next) {
   // reservation_time exists, attempt to parse the time
   const hour = Number(reservation_time.split(":")[0]);
   const mins = Number(reservation_time.split(":")[1]);
-  if (!hour || !mins) return next(error);
+
+  if(isNaN(hour) || isNaN(mins)) return next(error)
+  
   res.locals.hour = hour;
   res.locals.mins = mins;
   next();
@@ -108,7 +110,6 @@ function peopleIsValid(req, _res, next) {
   }
   next();
 }
-
 
 function dateIsInTheFuture(req, _res, next) {
   const { reservation_date, reservation_time } = req.body.data;
@@ -169,7 +170,8 @@ function newStatusIsValid(req, res, next) {
   if (
     (status && status === "booked") ||
     status === "seated" ||
-    status === "finished"
+    status === "finished" ||
+    status === "cancelled"
   )
     return next();
   next({
@@ -187,14 +189,20 @@ function isNotFinished(_req, res, next) {
   next();
 }
 
-async function update(req, res, next) {
-  const { status } = req.body.data;
-  const reservation = res.locals.reservation;
-  reservation.status = status;
-  const data = await service.update(res.locals.reservation);
+async function update(req, res, _next) {
+  const updatedReservation = req.body.data;
+
+  //const reservation = res.locals.reservation;
+  //reservation.status = status;
+  const data = await service.update(updatedReservation);
   res.json({ data });
 }
 
+async function status(req, res, _next) {
+  res.locals.reservation.status = req.body.data.status;
+  const data = await service.update(res.locals.reservation);
+  res.json({ data });
+}
 
 module.exports = {
   create: [
@@ -229,6 +237,6 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     isNotFinished,
     newStatusIsValid,
-    asyncErrorBoundary(update),
+    asyncErrorBoundary(status),
   ],
 };
