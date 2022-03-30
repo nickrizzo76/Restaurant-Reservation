@@ -55,7 +55,7 @@ async function fetchJson(url, options, onCancel) {
 /**
  * Retrieves all existing reservation.
  * @returns {Promise<[reservation]>}
- *  a promise that resolves to a possibly empty array of reservation saved in the database.
+ *  a promise that resolves to a possibly empty array of reservations saved in the database.
  */
 
 export async function listReservations(params, signal) {
@@ -68,6 +68,12 @@ export async function listReservations(params, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
+
+/**
+ * Creates a reservation.
+ * @returns {Promise<reservation>}
+ *  a promise that resolves to a reservation saved in the database.
+ */
 
 export async function createReservation(reservation, signal) {
   const url = new URL(`${API_BASE_URL}/tables`);
@@ -82,6 +88,22 @@ export async function createReservation(reservation, signal) {
   return response;
 }
 
+/**
+ * Retrieves all existing tables.
+ * @returns {Promise<[table]>}
+ *  a promise that resolves to a possibly empty array of tables saved in the database.
+ */
+ export async function listTables(signal) {
+  const url = new URL(`${API_BASE_URL}/tables`);
+  return await fetchJson(url, { headers, signal }, [])
+}
+
+
+/**
+ * Creates a table.
+ * @returns {Promise<table>}
+ *  a promise that resolves to a table saved in the database.
+ */
 export async function createTable(table, signal) {
   const url = new URL(`${API_BASE_URL}/tables`);
   const options = {
@@ -92,6 +114,20 @@ export async function createTable(table, signal) {
     signal: signal
   }
 
-  const response = await fetchJson(url, options, table)
-  return response;
+  return await fetchJson(url, options, table)
+}
+
+/**
+ * Finishes a table.
+ * @returns {Promise<table>}
+ *  a promise that resolves to a table updated in the database.
+ *  the table is freed of its reservation.
+ */
+export async function finishTable(table_id) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  const options = {
+    method: "DELETE",
+    headers,
+  };
+  return await fetchJson(url, options, {});
 }

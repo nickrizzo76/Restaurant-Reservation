@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { listReservations } from "../utils/api";
+import { listReservations, cancelReservation, listTables, finishTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { next, previous, today } from "../utils/date-time";
 import Reservation from "../layout/Reservation/Reservation";
+import Tables from "./Tables";
 
 /**
  * Defines the dashboard page.
@@ -13,10 +14,10 @@ import Reservation from "../layout/Reservation/Reservation";
  */
 function Dashboard({ date }) {
   const history = useHistory();
-
   const [reservations, setReservations] = useState([]);
   const [reservationDate, setReservationDate] = useState(date);
   const [reservationsError, setReservationsError] = useState(null);
+  const [tables, setTables] = useState([]);
 
   useEffect(loadDashboard, [reservationDate]);
 
@@ -27,7 +28,14 @@ function Dashboard({ date }) {
       .then(setReservations)
       .then(history.push(`/dashboard/?date=${reservationDate}`))
       .catch(setReservationsError);
+
+    listTables().then(setTables);
     return () => abortController.abort();
+  }
+
+  function onFinish(table_id, reservation_id) {
+    finishTable(table_id, reservation_id)
+      .then(loadDashboard)
   }
 
   const reservationList = (
@@ -79,7 +87,8 @@ function Dashboard({ date }) {
       ) : (
         <p>There are currently no reservations for {reservationDate}</p>
       )}
-      
+
+      <Tables onFinish={onFinish} tables={tables} />
     </main>
   );
 }
