@@ -35,7 +35,7 @@ function isValidName(req, _res, next) {
 
 function isValidCapacity(req, _res, next) {
   const { capacity } = req.body.data;
-  if (!capacity || typeof capacity !== "number") {
+  if (!capacity || typeof capacity !== "number" || capacity < 1) {
     next({ status: 400, message: "capacity" });
   }
   next();

@@ -33,7 +33,7 @@ function Dashboard({ date }) {
   const reservationList = (
     <ul>
       {reservations.map((res) => (
-        <li key={res.reservation_id}>
+        <li style={{ listStyleType: "none" }} key={res.reservation_id}>
           <Reservation reservation={res} />
         </li>
       ))}

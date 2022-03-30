@@ -70,7 +70,7 @@ export async function listReservations(params, signal) {
 }
 
 export async function createReservation(reservation, signal) {
-  const url = new URL(`${API_BASE_URL}/reservations`);
+  const url = new URL(`${API_BASE_URL}/tables`);
   const options = {
     method: 'POST',
     mode: 'cors',
@@ -78,6 +78,20 @@ export async function createReservation(reservation, signal) {
     body: JSON.stringify({data: reservation}),
     signal: signal
   }
-  const response = await fetchJson(url, options, [])
+  const response = await fetchJson(url, options, reservation)
+  return response;
+}
+
+export async function createTable(table, signal) {
+  const url = new URL(`${API_BASE_URL}/tables`);
+  const options = {
+    method: 'POST',
+    mode: 'cors',
+    headers: headers,
+    body: JSON.stringify({ data: table }),
+    signal: signal
+  }
+
+  const response = await fetchJson(url, options, table)
   return response;
 }
