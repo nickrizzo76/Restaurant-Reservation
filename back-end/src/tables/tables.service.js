@@ -7,13 +7,12 @@ function list() {
 
 function create(table) {
   return knex(tableName)
-    .insert(table)
-    .returning("*")
+    .insert(table, "*")
     .then((createdRecords) => createdRecords[0]);
 }
 
 function read(table_id) {
-  return knex(tableName).select("*").where({ table_id: table_id }).first();
+  return knex(tableName).where({ table_id: table_id }).first();
 }
 
 
@@ -53,5 +52,4 @@ module.exports = {
   read,
   seat,
   finish
-
 };
