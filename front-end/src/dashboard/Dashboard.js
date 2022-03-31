@@ -38,11 +38,18 @@ function Dashboard({ date }) {
       .then(loadDashboard)
   }
 
+  function onCancel(reservation_id) {
+    const abortController = new AbortController();
+    cancelReservation(reservation_id, abortController.signal)
+      .then(loadDashboard)
+    return () => abortController.abort();
+  }
+
   const reservationList = (
     <ul>
       {reservations.map((res) => (
         <li style={{ listStyleType: "none" }} key={res.reservation_id}>
-          <Reservation reservation={res} />
+          <Reservation onCancel={onCancel} reservation={res} />
         </li>
       ))}
     </ul>
@@ -62,7 +69,7 @@ function Dashboard({ date }) {
         }}
         className="btn btn-primary"
       >
-        Yesterday
+        {`<  Yesterday`}
       </button>
       <button
         type="button"
@@ -80,7 +87,7 @@ function Dashboard({ date }) {
         }}
         className="btn btn-primary"
       >
-        Tomorrow
+        {`Tomorrow  >`}
       </button>
       {reservations.length > 0 ? (
         reservationList

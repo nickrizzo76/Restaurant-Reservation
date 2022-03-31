@@ -88,6 +88,33 @@ export async function createReservation(reservation, signal) {
   return response;
 }
 
+export async function readReservation(reservation_id, signal) {
+  const url = new URL(`${API_BASE_URL}/reservations/${reservation_id}`);
+  const options = {
+    method: 'GET',
+    mode: 'cors',
+    headers: headers,
+    signal
+  }
+  return await fetchJson(url, options, reservation_id);
+}
+
+export async function cancelReservation(reservation_id, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
+  const options = {
+    method: "PUT",
+    mode: 'cors',
+    headers,
+    body: JSON.stringify({
+      data: {
+        status: "cancelled",
+      },
+    }),
+    signal,
+  };
+  return await fetchJson(url, options, {});
+}
+
 /**
  * Retrieves all existing tables.
  * @returns {Promise<[table]>}

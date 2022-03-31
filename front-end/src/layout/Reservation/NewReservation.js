@@ -34,6 +34,13 @@ function NewReservation({ date }) {
 
   const handleChange = ({ target }) => {
     let { value, name } = target;
+    if(name === 'people') {
+      setReservation({
+        ...reservation,
+        [name]: Number(value)
+      })
+      return
+    }
     if (name === 'first_name' || name === 'last_name') {
       const regex = /[a-zA-Z]/g; // match 1 word
       const cleanArray = value.match(regex);
@@ -187,7 +194,6 @@ function NewReservation({ date }) {
             name="people"
             type="number"
             min="1"
-            max="10"
             onChange={handleChange}
             value={reservation.people}
             required

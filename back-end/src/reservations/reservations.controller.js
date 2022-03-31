@@ -102,13 +102,14 @@ function timeIsValid(req, res, next) {
 
 function peopleIsValid(req, _res, next) {
   const { people } = req.body.data;
-  if (!people || typeof people !== "number" || people <= 0) {
+  if (!people || !Number.isInteger(people) || people <= 0) {
     return next({
       status: 400,
       message: `people`,
     });
   }
   next();
+  
 }
 
 function dateIsInTheFuture(req, _res, next) {
@@ -192,8 +193,6 @@ function isNotFinished(_req, res, next) {
 async function update(req, res, _next) {
   const updatedReservation = req.body.data;
 
-  //const reservation = res.locals.reservation;
-  //reservation.status = status;
   const data = await service.update(updatedReservation);
   res.json({ data });
 }
