@@ -43,9 +43,13 @@ function NewTable() {
   }
 
   const handleChange = ({ target: { name, value } }) => {
+    let newValue = value;
+    if(name === 'capacity') {
+      newValue = Number(value); 
+    }
     setTable({
       ...table,
-      [name]: value,
+      [name]: newValue,
     });
   };
 
