@@ -67,7 +67,7 @@ function Dashboard({ date }) {
         onClick={() => {
           setReservationDate(previous(reservationDate));
         }}
-        className="btn btn-primary"
+        className="btn btn-secondary"
       >
         {`<  Yesterday`}
       </button>
@@ -76,7 +76,7 @@ function Dashboard({ date }) {
         onClick={() => {
           setReservationDate(today(reservationDate));
         }}
-        className="btn btn-primary"
+        className="btn btn-secondary"
       >
         Today
       </button>
@@ -85,7 +85,7 @@ function Dashboard({ date }) {
         onClick={() => {
           setReservationDate(next(reservationDate));
         }}
-        className="btn btn-primary"
+        className="btn btn-secondary"
       >
         {`Tomorrow  >`}
       </button>
