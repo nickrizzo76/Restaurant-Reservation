@@ -32,7 +32,7 @@ function Dashboard({ date }) {
     listTables().then(setTables);
     return () => abortController.abort();
   }
-
+  
   function onFinish(table_id, reservation_id) {
     finishTable(table_id, reservation_id)
       .then(loadDashboard)
