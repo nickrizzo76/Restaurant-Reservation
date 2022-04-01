@@ -1,8 +1,6 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
 
 function Tables({onFinish, tables = [] }) {
-  const history = useHistory();
   function handleFinish({
       target: { dataset: { tableIdFinish, reservationIdFinish } } = {},
     }) {

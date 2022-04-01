@@ -8,7 +8,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Reservation({ onCancel, reservation = {} }) {
+function Reservation({ onCancel = ()=>{}, reservation = {} }) {
 
   function cancelHandler() {
     if(window.confirm("Do you want to cancel this reservation? This cannot be undone.")) {
@@ -19,7 +19,7 @@ function Reservation({ onCancel, reservation = {} }) {
     <>
       <div className="form-group row" key={reservation.reservation_id}>
         <div className="col-sm-1">{reservation.reservation_id}</div>
-        <div className="col-sm-1">
+        <div className="col-sm-2">
         {reservation.last_name}, {reservation.first_name}
         </div>
         <div className="col-sm-2">{reservation.mobile_number}</div>
