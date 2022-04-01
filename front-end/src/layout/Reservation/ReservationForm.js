@@ -30,14 +30,14 @@ function ReservationForm() {
   const [reservation, setReservation] = useState({
     ...initalFormState,
   });
-  const [reservationErrors, setReservationErrors] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (reservation_id) {
-      setReservationErrors(null);
+      setError(null);
       readReservation(reservation_id)
         .then(setReservation)
-        .catch(setReservationErrors);
+        .catch(setError);
     }
   }, [reservation_id]);
 
@@ -57,81 +57,28 @@ function ReservationForm() {
     });
   };
 
-//   function validate(reservation) {
-//     const errors = [];
-
-//     function isValidName({ first_name, last_name }) {
-//       if (first_name.length < 2) {
-//         errors.push(
-//           new Error(
-//             `First name '${first_name}' must be 2 or more letters and can't contain numbers or special characters.`
-//           )
-//         );
-//       }
-//       if (last_name.length < 2) {
-//         errors.push(
-//           new Error(
-//             `Last name '${last_name}' must be 2 or more letters and can't contain numbers or special characters.`
-//           )
-//         );
-//       }
-//     }
-
-//     function isFutureDate({ reservation_date, reservation_time }) {
-//       const dateTime = new Date(`${reservation_date}T${reservation_time}`);
-//       if (dateTime < new Date()) {
-//         errors.push(new Error("Reservation must be set in the future"));
-//       }
-//     }
-
-//     function isTuesday({ reservation_date }) {
-//       const day = new Date(reservation_date).getUTCDay();
-//       if (day === 2) {
-//         errors.push(new Error("No reservations available on Tuesday."));
-//       }
-//     }
-
-//     function isOpenHours({ reservation_time }) {
-//       const hour = parseInt(reservation_time.split(":")[0]);
-//       const mins = parseInt(reservation_time.split(":")[1]);
-
-//       if (hour <= 10 && mins <= 30) {
-//         errors.push(new Error("Restaurant is only open after 10:30 am"));
-//       }
-
-//       if (hour >= 22) {
-//         errors.push(new Error("Restaurant is closed after 10:00 pm"));
-//       }
-//     }
-
-//     isValidName(reservation);
-//     isFutureDate(reservation);
-//     isTuesday(reservation);
-//     isOpenHours(reservation);
-
-//     return errors;
-//   }
 
   function handleSubmit(event) {
     event.preventDefault();
 
+    console.log(reservation)
 
     const abortController = new AbortController();
-    setReservationErrors(null);
+    setError(null);
     // pull reservation_id from URL params to see if the user is editing or creating a reservation
     if (reservation_id) {
       // update reservation
       updateReservation(reservation, abortController.signal)
-        .then(history.push(`/dashboard/?date=${reservation.reservation_date}`))
+        .then(() => history.push(`/dashboard/?date=${reservation.reservation_date}`))
         .catch((error) => {
-          setReservationErrors(error);
+          setError(error);
         });
     } else {
       // create new reservation
     createReservation(reservation, abortController.signal)
-      .then(history.push(`/dashboard/?date=${reservation.reservation_date}`))
+      .then(() => history.push(`/dashboard/?date=${reservation.reservation_date}`))
       .catch((error) => {
-        setReservationErrors(error);
+        setError(error);
       });
     return () => abortController.abort();
     }
@@ -139,7 +86,7 @@ function ReservationForm() {
 
   return (
     <main>
-      <ErrorAlert error={reservationErrors ? reservationErrors[0] : null} />
+      <ErrorAlert error={error} />
       <form name="reservation-form" onSubmit={handleSubmit}>
         <div className="form-group d-md-flex mb-3">
           <label htmlFor="first-name">First Name</label>

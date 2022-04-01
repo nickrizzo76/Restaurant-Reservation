@@ -91,7 +91,10 @@ function timeIsValid(req, res, next) {
   };
   if (!reservation_time) return next(error);
   if(reservation_time[2] === ":") {
+    // remove colon
     reservation_time = reservation_time.replace(":", "");
+    // remove only store hours minutes
+    reservation_time = reservation_time.substring(0,4);
   }
   res.locals.hour = reservation_time.substring(0,2)
   res.locals.mins = reservation_time.substring(2,4)
