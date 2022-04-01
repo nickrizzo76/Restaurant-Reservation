@@ -30,7 +30,7 @@ function Search() {
     return () => abortController.abort();
   }
 
-  const reservationList = (
+  const reservationList = reservations.length ? (
     <ul>
       {reservations.map((res) => (
         <li style={{ listStyleType: "none" }} key={res.reservation_id}>
@@ -38,7 +38,7 @@ function Search() {
         </li>
       ))}
     </ul>
-  );
+  ) : <p>No reservations found</p>
 
   return (
     <main>
