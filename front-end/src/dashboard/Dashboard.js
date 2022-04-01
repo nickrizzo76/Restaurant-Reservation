@@ -76,7 +76,7 @@ function Dashboard({ date }) {
         onClick={() => {
           setReservationDate(today(reservationDate));
         }}
-        className="btn btn-secondary"
+        className="btn btn-secondary m-2"
       >
         Today
       </button>
