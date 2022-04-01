@@ -61,8 +61,6 @@ function ReservationForm() {
   function handleSubmit(event) {
     event.preventDefault();
 
-    console.log(reservation)
-
     const abortController = new AbortController();
     setError(null);
     // pull reservation_id from URL params to see if the user is editing or creating a reservation
