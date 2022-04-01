@@ -89,14 +89,15 @@ function timeIsValid(req, res, next) {
     message: "reservation_time",
   };
   if (!reservation_time) return next(error);
+  if(reservation_time[2] === ":") {
+    
+  } 
   // reservation_time exists, attempt to parse the time
-  const hour = Number(reservation_time.split(":")[0]);
-  const mins = Number(reservation_time.split(":")[1]);
+  // const hour = Number(reservation_time.split(":")[0]);
+  // const mins = Number(reservation_time.split(":")[1]);
 
-  if(isNaN(hour) || isNaN(mins)) return next(error)
+  // if(isNaN(hour) || isNaN(mins)) return next(error)
   
-  res.locals.hour = hour;
-  res.locals.mins = mins;
   next();
 }
 

@@ -18,7 +18,7 @@ function Search() {
   }
 
   function loadReservations() {
-    listReservations({ mobileNumber })
+    listReservations({ mobile_number: mobileNumber })
     .then(setReservations)
     .catch(setErrors);
   }
@@ -56,7 +56,7 @@ function Search() {
             placeholder="mobile number"
           />
         </label>
-        <input type="submit" value="Submit" />
+        <button type="submit">Submit</button>
       </form>
       {reservationList}
     </main>

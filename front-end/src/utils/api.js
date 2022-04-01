@@ -55,7 +55,6 @@ async function fetchJson(url, options, onCancel) {
 /**
  * Retrieves all existing reservation.
  * @returns {Promise<[reservation]>}
- *  a promise that resolves to a possibly empty array of reservations saved in the database.
  */
 
 export async function listReservations(params, signal) {
@@ -72,7 +71,6 @@ export async function listReservations(params, signal) {
 /**
  * Creates a reservation.
  * @returns {Promise<reservation>}
- *  a promise that resolves to a reservation saved in the database.
  */
 
 export async function createReservation(reservation, signal) {
@@ -88,6 +86,10 @@ export async function createReservation(reservation, signal) {
   return response;
 }
 
+/**
+ * Retrieves a reservation.
+ * @returns {Promise<reservation>}
+ */
 export async function readReservation(reservation_id, signal) {
   const url = new URL(`${API_BASE_URL}/reservations/${reservation_id}`);
   const options = {
@@ -101,6 +103,10 @@ export async function readReservation(reservation_id, signal) {
     .then(formatReservationTime);
 }
 
+/**
+ * Updates status of reservation and
+ * @returns {Promise<reservation>}
+ */
 export async function seatReservation(reservation_id, table_id, signal) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
   const options = {

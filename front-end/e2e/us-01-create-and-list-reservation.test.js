@@ -51,6 +51,7 @@ describe("US-01 - Create and list reservations - E2E", () => {
         page.click("[type=submit]"),
         page.waitForNavigation({ waitUntil: "networkidle0" }),
       ]);
+      // await new Promise((r) => setTimeout(r, 30000));
 
       await page.screenshot({
         path: ".screenshots/us-01-submit-after.png",

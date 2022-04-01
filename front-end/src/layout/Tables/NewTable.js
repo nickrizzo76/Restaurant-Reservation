@@ -65,7 +65,7 @@ function NewTable() {
     const abortController = new AbortController();
     setErrors(null);
     createTable(table, abortController.signal)
-      .then(history.push(`/dashboard`))
+      .then(() => history.push(`/dashboard`))
       .catch((error) => {
         setErrors(error);
       });

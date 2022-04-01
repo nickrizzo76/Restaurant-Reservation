@@ -50,11 +50,6 @@ function ReservationForm() {
       });
       return;
     }
-    if (name === "first_name" || name === "last_name") {
-      const regex = /[a-zA-Z]/g; // match 1 word
-      const cleanArray = value.match(regex);
-      value = cleanArray ? cleanArray.join("") : "";
-    }
 
     setReservation({
       ...reservation,
@@ -62,69 +57,64 @@ function ReservationForm() {
     });
   };
 
-  function validate(reservation) {
-    const errors = [];
+//   function validate(reservation) {
+//     const errors = [];
 
-    function isValidName({ first_name, last_name }) {
-      if (first_name.length < 2) {
-        errors.push(
-          new Error(
-            `First name '${first_name}' must be 2 or more letters and can't contain numbers or special characters.`
-          )
-        );
-      }
-      if (last_name.length < 2) {
-        errors.push(
-          new Error(
-            `Last name '${last_name}' must be 2 or more letters and can't contain numbers or special characters.`
-          )
-        );
-      }
-    }
+//     function isValidName({ first_name, last_name }) {
+//       if (first_name.length < 2) {
+//         errors.push(
+//           new Error(
+//             `First name '${first_name}' must be 2 or more letters and can't contain numbers or special characters.`
+//           )
+//         );
+//       }
+//       if (last_name.length < 2) {
+//         errors.push(
+//           new Error(
+//             `Last name '${last_name}' must be 2 or more letters and can't contain numbers or special characters.`
+//           )
+//         );
+//       }
+//     }
 
-    function isFutureDate({ reservation_date, reservation_time }) {
-      const dateTime = new Date(`${reservation_date}T${reservation_time}`);
-      if (dateTime < new Date()) {
-        errors.push(new Error("Reservation must be set in the future"));
-      }
-    }
+//     function isFutureDate({ reservation_date, reservation_time }) {
+//       const dateTime = new Date(`${reservation_date}T${reservation_time}`);
+//       if (dateTime < new Date()) {
+//         errors.push(new Error("Reservation must be set in the future"));
+//       }
+//     }
 
-    function isTuesday({ reservation_date }) {
-      const day = new Date(reservation_date).getUTCDay();
-      if (day === 2) {
-        errors.push(new Error("No reservations available on Tuesday."));
-      }
-    }
+//     function isTuesday({ reservation_date }) {
+//       const day = new Date(reservation_date).getUTCDay();
+//       if (day === 2) {
+//         errors.push(new Error("No reservations available on Tuesday."));
+//       }
+//     }
 
-    function isOpenHours({ reservation_time }) {
-      const hour = parseInt(reservation_time.split(":")[0]);
-      const mins = parseInt(reservation_time.split(":")[1]);
+//     function isOpenHours({ reservation_time }) {
+//       const hour = parseInt(reservation_time.split(":")[0]);
+//       const mins = parseInt(reservation_time.split(":")[1]);
 
-      if (hour <= 10 && mins <= 30) {
-        errors.push(new Error("Restaurant is only open after 10:30 am"));
-      }
+//       if (hour <= 10 && mins <= 30) {
+//         errors.push(new Error("Restaurant is only open after 10:30 am"));
+//       }
 
-      if (hour >= 22) {
-        errors.push(new Error("Restaurant is closed after 10:00 pm"));
-      }
-    }
+//       if (hour >= 22) {
+//         errors.push(new Error("Restaurant is closed after 10:00 pm"));
+//       }
+//     }
 
-    isValidName(reservation);
-    isFutureDate(reservation);
-    isTuesday(reservation);
-    isOpenHours(reservation);
+//     isValidName(reservation);
+//     isFutureDate(reservation);
+//     isTuesday(reservation);
+//     isOpenHours(reservation);
 
-    return errors;
-  }
+//     return errors;
+//   }
 
   function handleSubmit(event) {
     event.preventDefault();
 
-    const errors = validate(reservation);
-    if (errors.length) {
-      console.log(errors);
-      return setReservationErrors(errors);
-    }
 
     const abortController = new AbortController();
     setReservationErrors(null);
@@ -178,7 +168,7 @@ function ReservationForm() {
           <input
             id="mobile-number"
             name="mobile_number"
-            type="number"
+            type="text"
             onChange={handleChange}
             value={reservation.mobile_number}
             required

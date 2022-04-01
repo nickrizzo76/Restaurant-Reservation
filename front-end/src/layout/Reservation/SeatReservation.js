@@ -24,7 +24,7 @@ function SeatReservation(onSubmit) {
   }
 
   function changeHandler({ target: { value } }) {
-    setTableErrors(null)
+    setTableErrors(null);
     const errors = validate(value);
     if (errors.length) {
       console.log(errors);
@@ -54,7 +54,7 @@ function SeatReservation(onSubmit) {
   }
 
   function submitHandler(event) {
-    event.preventDefault()
+    event.preventDefault();
     const abortController = new AbortController();
 
     seatReservation(reservation_id, tableId, abortController.signal)
@@ -65,34 +65,35 @@ function SeatReservation(onSubmit) {
 
   return (
     <>
-      <select
-      className="m-2"
-        id="table_id"
-        name="table_id"
-        value={tableId}
-        required={true}
-        onChange={changeHandler}
+      <form onSubmit={submitHandler}>
+        <select
+          className="m-2"
+          id="table_id"
+          name="table_id"
+          value={tableId}
+          required={true}
+          onChange={changeHandler}
+        >
+          <option value="">Table</option>
+          {tables.map((table) => (
+            <option key={table.table_id} value={table.table_id}>
+              {table.table_name} - {table.capacity}
+            </option>
+          ))}
+        </select>
+        <button
+        type="submit"
+        className="btn btn-primary m-2"
       >
-        <option value="">Table</option>
-        {tables.map((table) => (
-          <option key={table.table_id} value={table.table_id}>
-            {table.table_name} - {table.capacity}
-          </option>
-        ))}
-      </select>
+        Submit
+      </button>
+      </form>
       <button
         type="button"
         className="btn btn-secondary m-2"
         onClick={() => history.goBack()}
       >
         Cancel
-      </button>
-      <button
-        type="button"
-        className="btn btn-primary m-2"
-        onClick={submitHandler}
-      >
-        Submit
       </button>
       <ErrorAlert error={tableErrors ? tableErrors[0] : null} />
     </>

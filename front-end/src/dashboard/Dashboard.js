@@ -22,12 +22,10 @@ function Dashboard({ date }) {
   useEffect(loadDashboard, [reservationDate]);
 
   function loadDashboard() {
-    console.log("load dashboard")
     const abortController = new AbortController();
     setReservationsError(null);
     listReservations({ date: reservationDate }, abortController.signal)
       .then(setReservations)
-      .then(history.push(`/dashboard/?date=${reservationDate}`))
       .catch(setReservationsError);
 
     listTables().then(setTables);
