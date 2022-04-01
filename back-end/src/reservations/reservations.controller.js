@@ -1,6 +1,16 @@
 const service = require("./reservations.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
+// checks if body contains data
+function hasBodyData(req, _res, next) {
+  const { data } = req.body;
+  if (!data)
+    next({
+      status: 400,
+    });
+  next();
+}
+
 async function reservationExists(req, res, next) {
   const reservation = await service.read(req.params.reservation_id);
   if (reservation) {
@@ -31,16 +41,6 @@ async function list(req, res, _next) {
   // list all reservations (no date given)
   data = await service.list();
   return res.json({ data });
-}
-
-// checks if body contains data
-function bodyHasData(req, _res, next) {
-  const { data } = req.body;
-  if (!data)
-    next({
-      status: 400,
-    });
-  next();
 }
 
 // Validate name exists and is not empty
@@ -83,22 +83,23 @@ function dateIsValid(req, _res, next) {
 
 // Validate that reservation time exists and is correctly formatted
 function timeIsValid(req, res, next) {
-  const { reservation_time } = req.body.data;
+  let { reservation_time } = req.body.data;
+
   const error = {
     status: 400,
     message: "reservation_time",
   };
   if (!reservation_time) return next(error);
   if(reservation_time[2] === ":") {
-    
-  } 
-  // reservation_time exists, attempt to parse the time
-  // const hour = Number(reservation_time.split(":")[0]);
-  // const mins = Number(reservation_time.split(":")[1]);
-
-  // if(isNaN(hour) || isNaN(mins)) return next(error)
-  
-  next();
+    reservation_time = reservation_time.replace(":", "");
+  }
+  res.locals.hour = reservation_time.substring(0,2)
+  res.locals.mins = reservation_time.substring(2,4)
+  if(Number.isInteger(Number(reservation_time))) {
+    next()
+  } else {
+    next(error);
+  }
 }
 
 function peopleIsValid(req, _res, next) {
@@ -206,7 +207,7 @@ async function status(req, res, _next) {
 
 module.exports = {
   create: [
-    bodyHasData,
+    hasBodyData,
     nameIsValid,
     mobileNumberIsValid,
     dateIsValid,
@@ -220,7 +221,7 @@ module.exports = {
   list: asyncErrorBoundary(list),
   read: [asyncErrorBoundary(reservationExists), read],
   update: [
-    bodyHasData,
+    hasBodyData,
     nameIsValid,
     mobileNumberIsValid,
     dateIsValid,
@@ -233,7 +234,7 @@ module.exports = {
     asyncErrorBoundary(update),
   ],
   status: [
-    bodyHasData,
+    hasBodyData,
     asyncErrorBoundary(reservationExists),
     isNotFinished,
     newStatusIsValid,
