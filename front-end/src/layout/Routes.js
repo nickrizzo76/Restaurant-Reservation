@@ -34,7 +34,7 @@ function Routes() {
         <Dashboard date={date ? date : today()} />
       </Route>
       <Route path="/reservations/new">
-        <NewReservation date={today()} />
+        <NewReservation />
       </Route>
       <Route path="/tables/new">
         <NewTable />

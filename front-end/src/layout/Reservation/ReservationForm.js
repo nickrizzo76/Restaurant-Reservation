@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ErrorAlert from "../ErrorAlert";
-import { useHistory } from "react-router-dom";
-import { createReservation } from "../../utils/api";
+import { useHistory, useParams } from "react-router-dom";
+import {
+  createReservation,
+  readReservation,
+  updateReservation,
+} from "../../utils/api";
 
 /**
  * Defines the new reservation for this application.
@@ -9,20 +13,16 @@ import { createReservation } from "../../utils/api";
  * @returns {JSX.Element}
  */
 
-function NewReservation({ date }) {
+function ReservationForm() {
   const history = useHistory();
-  const time = new Date();
-  const timeString = `${time.getHours().toString().padStart(2, "0")}:${time
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}`;
+  const { reservation_id } = useParams();
 
   const initalFormState = {
     first_name: "",
     last_name: "",
     mobile_number: "",
-    reservation_date: date,
-    reservation_time: timeString,
+    reservation_date: "",
+    reservation_time: "",
     people: 1,
     status: null,
   };
@@ -32,16 +32,25 @@ function NewReservation({ date }) {
   });
   const [reservationErrors, setReservationErrors] = useState(null);
 
+  useEffect(() => {
+    if (reservation_id) {
+      setReservationErrors(null);
+      readReservation(reservation_id)
+        .then(setReservation)
+        .catch(setReservationErrors);
+    }
+  }, [reservation_id]);
+
   const handleChange = ({ target }) => {
     let { value, name } = target;
-    if(name === 'people') {
+    if (name === "people") {
       setReservation({
         ...reservation,
-        [name]: Number(value)
-      })
-      return
+        [name]: Number(value),
+      });
+      return;
     }
-    if (name === 'first_name' || name === 'last_name') {
+    if (name === "first_name" || name === "last_name") {
       const regex = /[a-zA-Z]/g; // match 1 word
       const cleanArray = value.match(regex);
       value = cleanArray ? cleanArray.join("") : "";
@@ -119,17 +128,27 @@ function NewReservation({ date }) {
 
     const abortController = new AbortController();
     setReservationErrors(null);
+    // pull reservation_id from URL params to see if the user is editing or creating a reservation
+    if (reservation_id) {
+      // update reservation
+      updateReservation(reservation, abortController.signal)
+        .then(history.push(`/dashboard/?date=${reservation.reservation_date}`))
+        .catch((error) => {
+          setReservationErrors(error);
+        });
+    } else {
+      // create new reservation
     createReservation(reservation, abortController.signal)
       .then(history.push(`/dashboard/?date=${reservation.reservation_date}`))
       .catch((error) => {
         setReservationErrors(error);
       });
     return () => abortController.abort();
+    }
   }
 
   return (
     <main>
-      <h1>Create Reservation</h1>
       <ErrorAlert error={reservationErrors ? reservationErrors[0] : null} />
       <form name="reservation-form" onSubmit={handleSubmit}>
         <div className="form-group d-md-flex mb-3">
@@ -214,4 +233,4 @@ function NewReservation({ date }) {
   );
 }
 
-export default NewReservation;
+export default ReservationForm;
