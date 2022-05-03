@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { listReservations, cancelReservation, listTables, finishTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { next, previous, today } from "../utils/date-time";
@@ -13,7 +12,6 @@ import Tables from "./Tables";
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
-  const history = useHistory();
   const [reservations, setReservations] = useState([]);
   const [reservationDate, setReservationDate] = useState(date);
   const [reservationsError, setReservationsError] = useState(null);
